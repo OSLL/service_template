@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+    service:
+        container_name: project_service
+        image: project/service
+        build: .
+        ports:
+            - "8000"
+        volumes:
+            - ./app:/app:ro
+    tunnel:
+        container_name: project_tunnel_service
+        depends_on:
+            -   service
+        env_file:
+            - ./.env
+        image: cloudflare/cloudflared:latest
+        command: [ "tunnel",
+                   "--no-autoupdate",
+                   "run",
+                   "--token",
+                   "$CLOUDFLARE_TOKEN"
+        ]              
